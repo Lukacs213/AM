@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="hu">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ne nyisd meg!</title>
+    <style>
+        body {
+            margin: 0;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: black;
+            overflow: hidden;
+            color: white;
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 2rem;
+            text-align: center;
+        }
+
+        #message {
+            opacity: 0;
+            animation: fadeIn 5s forwards, glitch 0.1s infinite;
+        }
+
+        @keyframes fadeIn {
+            0% { opacity: 0; }
+            100% { opacity: 1; }
+        }
+
+        @keyframes glitch {
+            0% { transform: translate(0, 0); }
+            20% { transform: translate(-3px, 3px); }
+            40% { transform: translate(3px, -3px); }
+            60% { transform: translate(-3px, -3px); }
+            80% { transform: translate(3px, 3px); }
+            100% { transform: translate(0, 0); }
+        }
+
+        #creepy {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            background: red;
+            box-shadow: 0 0 50px red;
+            animation: pulse 1s infinite;
+            display: none;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.2); }
+            100% { transform: scale(1); }
+        }
+
+        .scream {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: url('https://i.imgur.com/JGqMEeU.png') no-repeat center center/cover;
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div id="message">Figyelj... valami közeledik!</div>
+    <div id="creepy"></div>
+    <div class="scream"></div>
+
+    <script>
+        const message = document.getElementById("message");
+        const creepy = document.getElementById("creepy");
+        const scream = document.querySelector(".scream");
+
+        setTimeout(() => {
+            creepy.style.display = "block";
+        }, 5000);
+
+        setTimeout(() => {
+            creepy.style.display = "none";
+            scream.style.display = "block";
+            playScreamSound();
+        }, 8000);
+
+        function playScreamSound() {
+            const audio = new Audio("https://www.fesliyanstudios.com/play-mp3/4397");
+            audio.play();
+        }
+    </script>
+</body>
+</html>

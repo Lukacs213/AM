@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="hu">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Házi Feladat Megoldó AI</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #f4f4f9;
+            color: #333;
+            padding: 20px;
+            text-align: center;
+        }
+        h1 {
+            color: #0077b6;
+        }
+        #response {
+            font-size: 1.2rem;
+            margin-top: 10px;
+        }
+        #loading {
+            font-size: 1.5rem;
+            color: #ff6f61;
+            display: none;
+        }
+        button {
+            background-color: #0077b6;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            font-size: 1.1rem;
+            cursor: pointer;
+            margin-top: 20px;
+        }
+        button:hover {
+            background-color: #005f85;
+        }
+        textarea {
+            width: 80%;
+            height: 100px;
+            margin-top: 20px;
+            padding: 10px;
+            font-size: 1rem;
+        }
+    </style>
+</head>
+<body>
+    <h1>Házi Feladat Megoldó AI</h1>
+    <div id="response"></div>
+    <textarea id="taskInput" placeholder="Írd be a házi feladatot..."></textarea>
+    <button onclick="solveTask()">Megoldás Kérése</button>
+    <div id="loading">Válasz készül... Kérem, várjon...</div>
+
+    <script>
+        async function solveTask() {
+            const taskInput = document.getElementById('taskInput').value;
+            if (!taskInput) {
+                alert('Kérlek, írd be a házi feladatot!');
+                return;
+            }
+
+            document.getElementById('loading').style.display = 'block';
+            document.getElementById('response').innerText = '';
+            const userInput = taskInput;
+
+            try {
+                const response = await fetch('https://api.openai.com/v1/chat/completions', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': 'Bearer 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'
+                    },
+                    body: JSON.stringify({
+                        model: "gpt-4o-mini",
+                        store: true,
+                        messages: [
+                            { "role": "user", "content": userInput }
+                        ]
+                    })
+                });
+
+                const data = await response.json();
+                document.getElementById('response').innerText = `Megoldás:\n\n${data.choices[0].message.content}`;
+                document.getElementById('loading').style.display = 'none';
+
+            } catch (error) {
+                console.error("API hiba:", error);
+                document.getElementById('response').innerText = 'Hiba történt, próbálja újra.';
+                document.getElementById('loading').style.display = 'none';
+            }
+        }
+    </script>
+</body>
+</html>

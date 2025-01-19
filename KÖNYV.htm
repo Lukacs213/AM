@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="hu">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LION</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-image: url('https://www.warnermusic.ie/wp-content/themes/yootheme/cache/bf/1-bf9fcf53.jpeg');
+            background-size: cover;
+            background-position: top;
+            background-repeat: no-repeat;
+            color: white;
+            margin: 0;
+            padding: 0;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            text-align: center;
+        }
+        #datetime {
+            margin-top: 20px;
+            font-size: 2rem;
+            text-shadow: 2px 2px 5px black;
+        }
+        .note-input, .search-bar {
+            padding: 10px;
+            font-size: 1rem;
+            margin: 10px 0;
+            width: 80%;
+            max-width: 400px;
+            border-radius: 5px;
+            border: none;
+            background: rgba(255, 255, 255, 0.8);
+        }
+        #notes-list {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 10px;
+            margin-top: 20px;
+        }
+        .note {
+            background: white;
+            color: black;
+            padding: 10px;
+            width: 5cm;
+            height: 5cm;
+            border-radius: 10px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            position: relative;
+        }
+        .note img {
+            width: 3cm;
+            height: 3cm;
+            margin-top: 10px;
+            border-radius: 5px;
+        }
+        .note button {
+            position: absolute;
+            top: 5px;
+            right: 5px;
+            background: black;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            cursor: pointer;
+            display: none;
+        }
+        .note:hover button {
+            display: block;
+        }
+        .emoji-bar {
+            display: flex;
+            justify-content: center;
+            margin-top: 10px;
+        }
+        .emoji-bar span {
+            font-size: 1.5rem;
+            cursor: pointer;
+            margin: 5px;
+        }
+        .footer {
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            margin-top: 20px;
+        }
+        .footer img {
+            width: 100px;
+            height: auto;
+            cursor: pointer;
+        }
+        #music-button {
+            position: fixed;
+            bottom: 60px;
+            left: 10px;
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            animation: color-change 10s infinite;
+            cursor: pointer;
+        }
+        @keyframes color-change {
+            0% { background-color: green; }
+            33% { background-color: blue; }
+            66% { background-color: purple; }
+            100% { background-color: green; }
+        }
+        #ai-chat {
+            display: none;
+            position: fixed;
+            bottom: 60px;
+            right: 10px;
+            background: rgba(0, 0, 0, 0.8);
+            padding: 20px;
+            border-radius: 10px;
+            max-width: 400px;
+            width: 80%;
+        }
+        #ai-chat input {
+            width: 100%;
+            padding: 10px;
+            border-radius: 5px;
+            border: none;
+        }
+        #ai-response {
+            color: yellow;
+            font-size: 1rem;
+            text-shadow: 1px 1px 3px black;
+        }
+        .search-bar {
+            margin-top: 20px;
+            width: 80%;
+        }
+        #search-results {
+            margin-top: 20px;
+            background-color: rgba(255, 255, 255, 0.7);
+            padding: 10px;
+            border-radius: 5px;
+        }
+        #search-results a {
+            color: black;
+            text-decoration: none;
+        }
+        #google-logo {
+            width: 30px;
+            height: auto;
+            margin-top: 10px;
+        }
+        #lion-logo {
+            width: 50px;
+            height: auto;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Dátum és idő -->
+    <div id="datetime">Betöltés...</div>
+
+    <!-- Jegyzetek -->
+    <div>
+        <input type="text" class="note-input" id="note-input" placeholder="Írj egy jegyzetet..." />
+        <textarea class="note-input" id="note-description" placeholder="Bővebb leírás"></textarea>
+        <input type="file" id="note-image" accept="image/*" />
+        <button onclick="saveNote()">Küldés</button>
+    </div>
+
+    <div id="notes-list"></div>
+
+    <!-- Kép és gombok -->
+    <div class="emoji-bar">
+        <span onclick="addEmoji('😊')">😊</span>
+        <span onclick="addEmoji('👍')">👍</span>
+        <span onclick="addEmoji('🎉')">🎉</span>
+    </div>
+
+    <div class="footer">
+        <a href="https://www.facebook.com/profile.php?id=61565002195463" target="_blank">
+            <img src="https://store-images.s-microsoft.com/image/apps.30645.9007199266245907.cb06f1f9-9154-408e-b4ef-d19f2325893b.ac3b465e-4384-42a8-9142-901c0405e1bc" alt="Facebook">
+        </a>
+        <a href="javascript:toggleNotes()">
+            <img src="https://seeklogo.com/images/C/chatcoin-chat-logo-D655A30A39-seeklogo.com.png" alt="Jegyzetek">
+        </a>
+        <a href="https://chat.openai.com/" target="_blank">
+            <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR0PrnFFG0KKihJIhOllxfLOII2r9LkQoFLfw&s" alt="ChatGPT">
+        </a>
+    </div>
+
+    <!-- Zene gomb -->
+    <button id="music-button" onclick="playMusic()">Zene</button>
+
+    <!-- AI Chat -->
+    <div id="ai-chat">
+        <input type="text" id="ai-input" placeholder="Kérdezz valamit...">
+        <button onclick="askAI()">Küldés</button>
+        <div id="ai-response"></div>
+    </div>
+
+    <!-- Google Kereső -->
+    <input type="text" class="search-bar" id="search-query" placeholder="Keresés Google-en..." oninput="searchGoogle()">
+    <div id="search-results"></div>
+
+    <!-- Kép és linkek -->
+    <img src="https://swisscognitive.ch/wp-content/uploads/2020/09/the-4-top-artificial-intelligence-trends-for-2021.jpeg" alt="AI Trends" onclick="toggleAIChat()">
+    <div>
+        <a href="https://mail.google.com/mail/u/0/?tab=rm&ogbl#inbox" class="footer-link">GMAIL</a>
+    </div>
+
+    <script>
+        let notesVisible = false;
+
+        function updateDateTime() {
+            const options = { timeZone: 'Europe/Budapest', year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit', second: '2-digit' };
+            const now = new Date().toLocaleString('hu-HU', options);
+            document.getElementById('datetime').textContent = now;
+        }
+
+        function saveNote() {
+            const noteInput = document.getElementById('note-input');
+            const noteDescription = document.getElementById('note-description');
+            const noteImage = document.getElementById('note-image');
+            if (noteInput.value.trim() || noteDescription.value.trim() || noteImage.files[0]) {
+                const notes = JSON.parse(localStorage.getItem('notes')) || [];
+                const note = {
+                    text: noteInput.value.trim(),
+                    description: noteDescription.value.trim(),
+                    image: noteImage.files[0] ? URL.createObjectURL(noteImage.files[0]) : null
+                };
+                notes.push(note);
+                localStorage.setItem('notes', JSON.stringify(notes));
+                noteInput.value = '';
+                noteDescription.value = '';
+                noteImage.value = '';
+                renderNotes();
+            } else {
+                alert('Írj valamit a jegyzetbe!');
+            }
+        }
+
+        function renderNotes() {
+            const notesList = document.getElementById('notes-list');
+            notesList.innerHTML = '';
+            const notes = JSON.parse(localStorage.getItem('notes')) || [];
+            notes.forEach((note, index) => {
+                const noteDiv = document.createElement('div');
+                noteDiv.classList.add('note');
+                noteDiv.innerHTML = `
+                    <div>${note.text}</div>
+                    <div>${note.description}</div>
+                    ${note.image ? `<img src="${note.image}" alt="Image">` : ''}
+                    <button onclick="editNote(${index})">Szerkesztés</button>
+                `;
+                notesList.appendChild(noteDiv);
+            });
+        }
+
+        function toggleNotes() {
+            notesVisible = !notesVisible;
+            document.getElementById('notes-list').style.display = notesVisible ? 'block' : 'none';
+        }
+
+        function playMusic() {
+            const music = new Audio('https://www.youtube.com/watch?v=8ocWUGARCB0');
+            music.play();
+        }
+
+        function askAI() {
+            const question = document.getElementById('ai-input').value;
+            document.getElementById('ai-response').textContent = `AI válasza a kérdésedre: "Hogy Vagy?" -> "Köszönöm jól vagyok."`; // Example response
+        }
+
+        function searchGoogle() {
+            const query = document.getElementById('search-query').value;
+            if (query) {
+                window.location.href = `https://www.google.com/search?q=${query}`;
+            }
+        }
+
+        function toggleAIChat() {
+            document.getElementById('ai-chat').style.display = document.getElementById('ai-chat').style.display === 'block' ? 'none' : 'block';
+        }
+
+        updateDateTime();
+        setInterval(updateDateTime, 1000);
+        renderNotes();
+    </script>
+</body>
+</html>

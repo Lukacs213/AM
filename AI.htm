@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="hu">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Modern AI Chat</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #f5f6f8;
+            margin: 0;
+            padding: 0;
+        }
+        .chat-container {
+            max-width: 800px;
+            margin: 50px auto;
+            background: #fff;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            height: 70vh;
+        }
+        .chat-box {
+            flex-grow: 1;
+            overflow-y: auto;
+            padding-right: 20px;
+            margin-bottom: 10px;
+            border-bottom: 2px solid #f0f0f0;
+        }
+        .message {
+            margin: 10px 0;
+            padding: 10px;
+            border-radius: 10px;
+            background-color: #f0f0f0;
+            max-width: 80%;
+            margin-left: auto;
+        }
+        .user-message {
+            background-color: #d2e7ff;
+            margin-left: 0;
+        }
+        .ai-message {
+            background-color: #ffeb91;
+            margin-right: 0;
+        }
+        #loading {
+            text-align: center;
+            color: #ff6f61;
+            display: none;
+            font-size: 1.2rem;
+        }
+        input[type="text"] {
+            padding: 10px;
+            width: 100%;
+            border: 2px solid #ccc;
+            border-radius: 20px;
+            outline: none;
+            font-size: 1.1rem;
+            margin-top: 10px;
+        }
+        input[type="text"]:focus {
+            border-color: #0077b6;
+        }
+        button {
+            padding: 10px 20px;
+            background-color: #0077b6;
+            color: white;
+            font-size: 1rem;
+            border: none;
+            border-radius: 20px;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+        button:hover {
+            background-color: #005f85;
+        }
+    </style>
+</head>
+<body>
+    <div class="chat-container">
+        <div id="chat-box" class="chat-box">
+            <!-- Chat messages will appear here -->
+        </div>
+        <div id="loading" class="message">Válasz készül...</div>
+        <input type="text" id="user-input" placeholder="Írj egy kérdést..." />
+        <button onclick="sendMessage()">Küldés</button>
+    </div>
+
+    <script>
+        async function sendMessage() {
+            const userMessage = document.getElementById('user-input').value;
+            if (!userMessage.trim()) return;
+
+            // Display user message
+            displayMessage(userMessage, 'user');
+
+            // Clear input field
+            document.getElementById('user-input').value = '';
+
+            // Show loading message
+            document.getElementById('loading').style.display = 'block';
+            document.getElementById('chat-box').scrollTop = document.getElementById('chat-box').scrollHeight;
+
+            try {
+                const response = await fetch('https://api.openai.com/v1/chat/completions', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': 'Bearer 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'
+                    },
+                    body: JSON.stringify({
+                        model: "gpt-4o-mini",
+                        store: true,
+                        messages: [
+                            { "role": "user", "content": userMessage }
+                        ]
+                    })
+                });
+
+                const data = await response.json();
+                const aiResponse = data.choices[0].message.content;
+
+                // Hide loading message
+                document.getElementById('loading').style.display = 'none';
+
+                // Display AI response
+                displayMessage(aiResponse, 'ai');
+            } catch (error) {
+                console.error('API hiba:', error);
+                document.getElementById('loading').style.display = 'none';
+            }
+        }
+
+        function displayMessage(message, role) {
+            const messageElement = document.createElement('div');
+            messageElement.classList.add('message');
+            messageElement.classList.add(role === 'user' ? 'user-message' : 'ai-message');
+            messageElement.textContent = message;
+            document.getElementById('chat-box').appendChild(messageElement);
+            document.getElementById('chat-box').scrollTop = document.getElementById('chat-box').scrollHeight;
+        }
+    </script>
+</body>
+</html>

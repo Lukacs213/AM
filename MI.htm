@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="hu">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Haiku Generator</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #282c34;
+            color: white;
+            text-align: center;
+            padding: 20px;
+        }
+        button {
+            padding: 10px;
+            background-color: #61dafb;
+            color: black;
+            border: none;
+            cursor: pointer;
+        }
+        #haiku {
+            margin-top: 20px;
+            font-size: 1.5rem;
+            color: #61dafb;
+        }
+    </style>
+</head>
+<body>
+    <h1>AI Haiku Generator</h1>
+    <button onclick="generateHaiku()">Generate Haiku</button>
+    <div id="haiku"></div>
+
+    <script>
+        async function generateHaiku() {
+            const apiKey = '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'; // API kulcs
+
+            const response = await fetch('https://api.openai.com/v1/chat/completions', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${apiKey}`
+                },
+                body: JSON.stringify({
+                    model: "gpt-4o-mini",
+                    messages: [
+                        { "role": "user", "content": "write a haiku about ai" }
+                    ]
+                })
+            });
+
+            const data = await response.json();
+            const haiku = data.choices[0].message.content;
+            document.getElementById('haiku').innerText = haiku;
+        }
+    </script>
+</body>
+</html>

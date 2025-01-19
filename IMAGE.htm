@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="hu">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Játék</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+        }
+        #chatbox {
+            margin-bottom: 10px;
+            height: 300px;
+            overflow-y: scroll;
+            border: 1px solid #ccc;
+            padding: 10px;
+        }
+        input[type="text"] {
+            width: 80%;
+            padding: 10px;
+        }
+        button {
+            padding: 10px;
+        }
+    </style>
+</head>
+<body>
+    <h1>AI Játék</h1>
+    <div id="chatbox"></div>
+    <input type="text" id="userInput" placeholder="Írd be a válaszod...">
+    <button onclick="sendMessage()">Send</button>
+
+    <script>
+        async function sendMessage() {
+            const userMessage = document.getElementById('userInput').value;
+            if (!userMessage) {
+                alert('Kérlek, írj be egy választ!');
+                return;
+            }
+
+            // Mutasd a felhasználói üzenetet a chatboxban
+            const chatbox = document.getElementById('chatbox');
+            chatbox.innerHTML += `<div><strong>Te:</strong> ${userMessage}</div>`;
+
+            // Küldd el az üzenetet a backend szervernek
+            const response = await fetch('http://localhost:3000/play-game', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ message: userMessage })
+            });
+
+            const data = await response.json();
+
+            // Mutasd az AI válaszát a chatboxban
+            chatbox.innerHTML += `<div><strong>AI:</strong> ${data.message}</div>`;
+
+            // Görgess a legújabb üzenetre
+            chatbox.scrollTop = chatbox.scrollHeight;
+
+            // Üresítsd ki a bemeneti mezőt
+            document.getElementById('userInput').value = '';
+        }
+    </script>
+</body>
+</html>

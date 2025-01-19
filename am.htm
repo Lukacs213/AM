@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>?????</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: black;
+            overflow: hidden;
+        }
+
+        canvas {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <canvas id="mysteryCanvas"></canvas>
+
+    <script>
+        const canvas = document.getElementById("mysteryCanvas");
+        const ctx = canvas.getContext("2d");
+
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+
+        let mystery = [];
+
+        function generateMystery() {
+            for (let i = 0; i < 100; i++) {
+                mystery.push({
+                    x: Math.random() * canvas.width,
+                    y: Math.random() * canvas.height,
+                    size: Math.random() * 5 + 2,
+                    dx: Math.random() * 2 - 1,
+                    dy: Math.random() * 2 - 1,
+                    color: `hsl(${Math.random() * 360}, 100%, 50%)`,
+                });
+            }
+        }
+
+        function drawMystery() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            mystery.forEach(m => {
+                ctx.beginPath();
+                ctx.arc(m.x, m.y, m.size, 0, Math.PI * 2);
+                ctx.fillStyle = m.color;
+                ctx.fill();
+            });
+        }
+
+        function updateMystery() {
+            mystery.forEach(m => {
+                m.x += m.dx;
+                m.y += m.dy;
+
+                if (m.x < 0 || m.x > canvas.width) m.dx *= -1;
+                if (m.y < 0 || m.y > canvas.height) m.dy *= -1;
+            });
+        }
+
+        function animate() {
+            drawMystery();
+            updateMystery();
+            requestAnimationFrame(animate);
+        }
+
+        generateMystery();
+        animate();
+    </script>
+</body>
+</html>
